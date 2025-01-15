@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { server } from '../src/mocks/server';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -22,6 +23,20 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    if (__DEV__) {
+      // Start the mock server in development mode
+      server.listen({
+        onUnhandledRequest: 'bypass', // Allow unhandled requests to pass through
+      });
+      console.log('Mock server running');
+
+      return () => {
+        server.close(); // Cleanup the server on unmount
+      };
+    }
+  }, []);
 
   if (!loaded) {
     return null;

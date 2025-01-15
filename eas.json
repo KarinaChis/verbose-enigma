@@ -1,0 +1,36 @@
+{
+  "cli": {
+    "version": ">= 14.4.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "build-and-maestro-test": {
+      "withoutCredentials": true,
+      "config": "build-and-maestro-test.yml",
+      "android": {
+        "buildType": "apk",
+        "image": "latest"
+      },
+      "ios": {
+        "simulator": true,
+        "image": "latest"
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
