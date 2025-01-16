@@ -1,20 +1,39 @@
-import HomeScreen from '@/app/(tabs)';
-import { render } from '@testing-library/react-native';
+import HomeScreen from "@/app/(tabs)";
+import { server } from "@/src/mocks/server";
+import { render, waitFor } from "@testing-library/react-native";
+import { http, HttpResponse } from "msw";
 
-import { server } from '../src/mocks/server';
-
-// Establish API mocking before all tests
-beforeAll(() => server.listen());
-
-// Reset any request handlers that we may add during the tests
-afterEach(() => server.resetHandlers());
-
-// Clean up after the tests are finished
-afterAll(() => server.close());
-describe('<HomeScreen />', () => {
-  test('Text renders correctly on HomeScreen', () => {
+describe("<HomeScreen />", () => {
+  test("Name renders correctly on HomeScreen", async () => {
+    server.use(
+      http.get("https://dummyjson.com/users", () => {
+        return HttpResponse.json({ users: [{ id: "1", username: "John111" }] });
+      })
+    );
     const { getByText } = render(<HomeScreen />);
 
-    getByText('Welcome!');
+    await waitFor(() => getByText("John111"));
+  });
+
+  test("Name renders correctly on HomeScreen second time", async () => {
+    server.use(
+      http.get("https://dummyjson.com/users", () => {
+        return HttpResponse.json({ users: [{ id: "1", username: "John222" }] });
+      })
+    );
+    const { getByText } = render(<HomeScreen />);
+
+    await waitFor(() => getByText("John222"));
+  });
+
+  test("Name renders correctly on HomeScreen second time", async () => {
+    server.use(
+      http.get("https://dummyjson.com/users", () => {
+        return HttpResponse.json({ users: [{ id: "1", username: "John222" }] });
+      })
+    );
+    const { getByText } = render(<HomeScreen />);
+
+    await waitFor(() => getByText("John222"));
   });
 });
