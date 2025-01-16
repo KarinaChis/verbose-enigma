@@ -10,6 +10,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { server } from "../src/mocks/server";
 import "react-native-reanimated";
+import { Client, Provider, cacheExchange, fetchExchange } from "urql";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -20,6 +21,11 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  const client = new Client({
+    url: "https://graphqlzero.almansi.me/api",
+    exchanges: [cacheExchange, fetchExchange],
   });
 
   useEffect(() => {
@@ -33,12 +39,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Provider value={client}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </Provider>
   );
 }
