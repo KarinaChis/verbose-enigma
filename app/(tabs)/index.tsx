@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { gql, useQuery } from "urql";
+import { gql, useMutation, useQuery } from "urql";
 
 export const CustomText = ({ children }: PropsWithChildren) => (
   <Text>{children}</Text>
@@ -29,9 +29,16 @@ const PostsQuery = gql`
   }
 `;
 
+const DeletePost = gql`
+  mutation DeletePost($id: ID!) {
+    deletePost(id: $id)
+  }
+`;
+
 export default function HomeScreen() {
   const [result] = useQuery({ query: PostsQuery });
   const { data, fetching, error } = result;
+  const [, deletePost] = useMutation(DeletePost);
 
   if (fetching) {
     return (
@@ -54,10 +61,17 @@ export default function HomeScreen() {
         data={data.posts.data}
         renderItem={({ item: post }) => {
           return (
-            <View key={post.id} style={styles.post}>
+            <View key={post.id} style={styles.post} testID={`post_${post.id}`}>
               <Text>{post.id}</Text>
               <Text style={styles.postTitle}>{post.title}</Text>
-              <Button color="red" title="Remove" />
+              <Button
+                color="red"
+                onPress={() => {
+                  deletePost({ id: post.id });
+                }}
+                title="Remove"
+                testID={`post_${post.id}_button`}
+              />
             </View>
           );
         }}

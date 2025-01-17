@@ -1,6 +1,6 @@
 import HomeScreen from "@/app/(tabs)";
 import { server } from "@/src/mocks/server";
-import { waitFor } from "@testing-library/react-native";
+import { fireEvent, waitFor } from "@testing-library/react-native";
 import { HttpResponse } from "msw";
 import { graphql } from "msw";
 import { graphql as executeGraphQL } from "graphql";
@@ -73,5 +73,38 @@ describe("<HomeScreen />", () => {
     );
 
     await waitFor(() => expect(getAllByText("Remove")).toHaveLength(2));
+  });
+
+  describe("when delete button is pressed", () => {
+    it("removes the post", async () => {
+      const { findByTestId, queryByText } = customRender(<HomeScreen />);
+      const mutation = jest.fn();
+      server.use(
+        graphql.query("PostsQuery", async ({ query, variables }) => {
+          const { errors, data } = await executeGraphQL({
+            schema: mockedSchema,
+            source: query,
+            variableValues: variables,
+            rootValue: {
+              posts: {
+                data: [{ id: "1", title: "title" }],
+              },
+            },
+          });
+
+          return HttpResponse.json({ errors, data });
+        }),
+        graphql.mutation("DeletePost", ({ variables }) => {
+          if (variables.id === "1") {
+            mutation();
+          }
+        })
+      );
+
+      const button = await findByTestId("post_1_button");
+      fireEvent.press(button);
+
+      await waitFor(() => expect(mutation).toHaveBeenCalled());
+    });
   });
 });
