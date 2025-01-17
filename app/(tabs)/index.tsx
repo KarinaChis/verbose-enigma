@@ -23,19 +23,10 @@ const PostsQuery = gql`
 `;
 
 export default function HomeScreen() {
-  const [users, setUsers] = useState<User[]>([]);
-
   const [result] = useQuery({ query: PostsQuery });
   const { data, fetching, error } = result;
 
-  useEffect(() => {
-    fetch("https://dummyjson.com/users")
-      .then((response) => response.json())
-      .then((data) => setUsers(data.users))
-      .catch((error) => console.error("Error:", error));
-  }, []);
-
-  if (users?.length === 0 || fetching) {
+  if (fetching) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -52,9 +43,6 @@ export default function HomeScreen() {
 
   return (
     <View>
-      {users.splice(0, 10).map((user) => (
-        <Text key={user.id + 1}>{user.username}</Text>
-      ))}
       {data.posts.data.splice(0, 10).map((post) => (
         <Text key={post.id}>{post.title}</Text>
       ))}

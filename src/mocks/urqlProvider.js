@@ -2,7 +2,7 @@ import { buildSchema } from "graphql";
 import React from "react";
 import { render } from "@testing-library/react-native";
 
-import { Client, Provider, cacheExchange, fetchExchange } from "urql";
+import { Client, Provider, fetchExchange } from "urql";
 
 export const mockedSchema = buildSchema(`
     type Post {
@@ -20,8 +20,8 @@ export const mockedSchema = buildSchema(`
   `);
 
 const client = new Client({
-  url: "https://dummyjson.com/users", // Match this to your MSW mock
-  exchanges: [cacheExchange, fetchExchange],
+  url: "https://graphqlzero.almansi.me/api",
+  exchanges: [fetchExchange],
   fetchOptions: () => ({ headers: { "Content-Type": "application/json" } }),
 });
 

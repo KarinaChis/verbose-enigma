@@ -4,5 +4,4 @@ export const handlers = [
   graphql.operation(() => {
     return HttpResponse.json({});
   }),
-  http.get("https://dummyjson.com/users", () => {}),
 ];
