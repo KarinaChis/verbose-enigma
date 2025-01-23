@@ -18,18 +18,22 @@ describe("<HomeScreen />", () => {
     const { getByText } = customRender(<HomeScreen />);
 
     server.use(
-      graphql.query("PostsQuery", async ({ query, variables }) => {
-        const { errors, data } = await executeGraphQL({
-          schema: mockedSchema,
-          source: query,
-          variableValues: variables,
-          rootValue: {
-            posts: { data: [{ id: "1", title: "awesome title" }] },
-          },
-        });
+      graphql.query(
+        "PostsQuery",
+        async ({ query, variables }) => {
+          const { errors, data } = await executeGraphQL({
+            schema: mockedSchema,
+            source: query,
+            variableValues: variables,
+            rootValue: {
+              posts: { data: [{ id: "1", title: "awesome title" }] },
+            },
+          });
 
-        return HttpResponse.json({ errors, data });
-      })
+          return HttpResponse.json({ errors, data });
+        },
+        { once: true }
+      )
     );
 
     await waitFor(() => getByText("awesome title"));
@@ -39,18 +43,22 @@ describe("<HomeScreen />", () => {
     const { getByText } = customRender(<HomeScreen />);
 
     server.use(
-      graphql.query("PostsQuery", async ({ query, variables }) => {
-        const { errors, data } = await executeGraphQL({
-          schema: mockedSchema,
-          source: query,
-          variableValues: variables,
-          rootValue: {
-            posts: { data: [{ id: "1", title: "awesome title 2" }] },
-          },
-        });
+      graphql.query(
+        "PostsQuery",
+        async ({ query, variables }) => {
+          const { errors, data } = await executeGraphQL({
+            schema: mockedSchema,
+            source: query,
+            variableValues: variables,
+            rootValue: {
+              posts: { data: [{ id: "1", title: "awesome title 2" }] },
+            },
+          });
 
-        return HttpResponse.json({ errors, data });
-      })
+          return HttpResponse.json({ errors, data });
+        },
+        { once: true }
+      )
     );
 
     await waitFor(() => getByText("awesome title 2"));
@@ -60,16 +68,20 @@ describe("<HomeScreen />", () => {
     const { getAllByText } = customRender(<HomeScreen />);
 
     server.use(
-      graphql.query("PostsQuery", async ({ query, variables }) => {
-        const { errors, data } = await executeGraphQL({
-          schema: mockedSchema,
-          source: query,
-          variableValues: variables,
-          rootValue: { posts: defaultPosts },
-        });
+      graphql.query(
+        "PostsQuery",
+        async ({ query, variables }) => {
+          const { errors, data } = await executeGraphQL({
+            schema: mockedSchema,
+            source: query,
+            variableValues: variables,
+            rootValue: { posts: defaultPosts },
+          });
 
-        return HttpResponse.json({ errors, data });
-      })
+          return HttpResponse.json({ errors, data });
+        },
+        { once: true }
+      )
     );
 
     await waitFor(() => expect(getAllByText("Remove")).toHaveLength(2));
@@ -77,28 +89,39 @@ describe("<HomeScreen />", () => {
 
   describe("when delete button is pressed", () => {
     it("removes the post", async () => {
-      const { findByTestId, queryByText } = customRender(<HomeScreen />);
+      const { findByTestId } = customRender(<HomeScreen />);
       const mutation = jest.fn();
-      server.use(
-        graphql.query("PostsQuery", async ({ query, variables }) => {
-          const { errors, data } = await executeGraphQL({
-            schema: mockedSchema,
-            source: query,
-            variableValues: variables,
-            rootValue: {
-              posts: {
-                data: [{ id: "1", title: "title" }],
-              },
-            },
-          });
 
-          return HttpResponse.json({ errors, data });
-        }),
-        graphql.mutation("DeletePost", ({ variables }) => {
-          if (variables.id === "1") {
-            mutation();
-          }
-        })
+      server.use(
+        graphql.query(
+          "PostsQuery",
+          async ({ query, variables }) => {
+            const { errors, data } = await executeGraphQL({
+              schema: mockedSchema,
+              source: query,
+              variableValues: variables,
+              rootValue: {
+                posts: {
+                  data: [{ id: "1", title: "title" }],
+                },
+              },
+            });
+
+            return HttpResponse.json({ errors, data });
+          },
+          { once: true }
+        ),
+        graphql.mutation(
+          "DeletePost",
+          ({ variables }) => {
+            if (variables.id === "1") {
+              mutation();
+            }
+
+            return HttpResponse.json({});
+          },
+          { once: true }
+        )
       );
 
       const button = await findByTestId("post_1_button");

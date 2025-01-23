@@ -8,7 +8,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { server } from "../src/mocks/server";
 import "react-native-reanimated";
 import { Client, Provider, cacheExchange, fetchExchange } from "urql";
 

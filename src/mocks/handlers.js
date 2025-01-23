@@ -1,7 +1,14 @@
-import { graphql, http, HttpResponse } from "msw";
+import { graphql, HttpResponse } from "msw";
+
+const defaultPosts = {
+  data: [
+    { id: 1, title: "title" },
+    { id: 2, title: "title" },
+  ],
+};
 
 export const handlers = [
-  graphql.operation(() => {
-    return HttpResponse.json({});
+  graphql.query("PostsQuery", async () => {
+    return HttpResponse.json({ data: { posts: defaultPosts } });
   }),
 ];
