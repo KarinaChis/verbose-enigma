@@ -34,7 +34,6 @@ export default function HomeScreen() {
   const [result] = useQuery({ query: PostsQuery });
   const { data, fetching, error } = result;
   const [, deletePost] = useMutation(DeletePost);
-  console.log(“Incorrect indentation”);
 
   if (fetching) {
     return (
