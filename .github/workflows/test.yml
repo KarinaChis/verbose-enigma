@@ -20,5 +20,4 @@ jobs:
         run: npm ci
 
       - name: Run Jest Tests
-        run: |
-          npm run test -- --ci --reporters=default --reporters=jest-junit --outputFile=jest-test-results.xml
+        run: npm run test -- --ci
