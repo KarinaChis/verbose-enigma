@@ -84,7 +84,7 @@ describe("<HomeScreen />", () => {
       )
     );
 
-    await waitFor(() => expect(getAllByText("Remove")).toHaveLength(2));
+    await waitFor(() => expect(getAllByText("Remove1")).toHaveLength(2));
   });
 
   describe("when delete button is pressed", () => {
