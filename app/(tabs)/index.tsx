@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren } from "react";
 import {
   Button,
   FlatList,
@@ -12,11 +12,6 @@ import { gql, useMutation, useQuery } from "urql";
 export const CustomText = ({ children }: PropsWithChildren) => (
   <Text>{children}</Text>
 );
-
-type User = {
-  id: KeyType;
-  username: String;
-};
 
 const PostsQuery = gql`
   query PostsQuery {
