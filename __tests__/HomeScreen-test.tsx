@@ -3,38 +3,17 @@ import { server } from "@/src/mocks/server";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 import { HttpResponse } from "msw";
 import { graphql } from "msw";
-import { graphql as executeGraphQL } from "graphql";
-import { customRender, mockedSchema } from "@/src/mocks/urqlProvider";
-
-const defaultPosts = {
-  data: [
-    { id: 1, title: "title" },
-    { id: 2, title: "title" },
-  ],
-};
+import { customRender } from "@/src/mocks/urqlProvider";
+import { handler } from "@/src/mocks/handlers";
 
 describe("<HomeScreen />", () => {
   test("Post title renders correctly on HomeScreen", async () => {
     const { getByText } = customRender(<HomeScreen />);
 
-    server.use(
-      graphql.query(
-        "PostsQuery",
-        async ({ query, variables }) => {
-          const { errors, data } = await executeGraphQL({
-            schema: mockedSchema,
-            source: query,
-            variableValues: variables,
-            rootValue: {
-              posts: { data: [{ id: "1", title: "awesome title" }] },
-            },
-          });
-
-          return HttpResponse.json({ errors, data });
-        },
-        { once: true }
-      )
-    );
+    handler.withMocks({
+      PostsPage: () => ({ data: [{}] }),
+      Post: () => ({ id: "1", title: "awesome title" }),
+    });
 
     await waitFor(() => getByText("awesome title"));
   });
@@ -42,24 +21,10 @@ describe("<HomeScreen />", () => {
   test("Post title renders correctly on HomeScreen second time", async () => {
     const { getByText } = customRender(<HomeScreen />);
 
-    server.use(
-      graphql.query(
-        "PostsQuery",
-        async ({ query, variables }) => {
-          const { errors, data } = await executeGraphQL({
-            schema: mockedSchema,
-            source: query,
-            variableValues: variables,
-            rootValue: {
-              posts: { data: [{ id: "1", title: "awesome title 2" }] },
-            },
-          });
-
-          return HttpResponse.json({ errors, data });
-        },
-        { once: true }
-      )
-    );
+    handler.withMocks({
+      PostsPage: () => ({ data: [{}] }),
+      Post: () => ({ id: "1", title: "awesome title 2" }),
+    });
 
     await waitFor(() => getByText("awesome title 2"));
   });
@@ -67,22 +32,7 @@ describe("<HomeScreen />", () => {
   test("displays delete buttons for every post", async () => {
     const { getAllByText } = customRender(<HomeScreen />);
 
-    server.use(
-      graphql.query(
-        "PostsQuery",
-        async ({ query, variables }) => {
-          const { errors, data } = await executeGraphQL({
-            schema: mockedSchema,
-            source: query,
-            variableValues: variables,
-            rootValue: { posts: defaultPosts },
-          });
-
-          return HttpResponse.json({ errors, data });
-        },
-        { once: true }
-      )
-    );
+    handler.withMocks({ PostsPage: () => ({ data: [{}, {}] }) });
 
     await waitFor(() => expect(getAllByText("Remove")).toHaveLength(2));
   });
@@ -92,25 +42,12 @@ describe("<HomeScreen />", () => {
       const { findByTestId } = customRender(<HomeScreen />);
       const mutation = jest.fn();
 
-      server.use(
-        graphql.query(
-          "PostsQuery",
-          async ({ query, variables }) => {
-            const { errors, data } = await executeGraphQL({
-              schema: mockedSchema,
-              source: query,
-              variableValues: variables,
-              rootValue: {
-                posts: {
-                  data: [{ id: "1", title: "title" }],
-                },
-              },
-            });
+      handler.withMocks({
+        PostsPage: () => ({ data: [{}] }),
+        Post: () => ({ id: "1" }),
+      });
 
-            return HttpResponse.json({ errors, data });
-          },
-          { once: true }
-        ),
+      server.use(
         graphql.mutation(
           "DeletePost",
           ({ variables }) => {
