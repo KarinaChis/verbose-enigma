@@ -17,6 +17,14 @@ export const mockedSchema = buildSchema(`
     type Query {
       posts: PostsPage!
     }
+
+    type Mutation {
+      deletePost(id: ID!): DeletePostPayload!
+    }
+
+    type DeletePostPayload {
+      id: ID!
+    }
   `);
 
 const client = new Client({
